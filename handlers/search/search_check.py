@@ -1,7 +1,7 @@
 from loader import bot
 from states import States
 from telebot.types import Message
-from .search_result import result
+from .search_result import result, clear
 
 @bot.message_handler(state=States.search_check)
 def search_check(message: Message) -> None:
@@ -10,3 +10,4 @@ def search_check(message: Message) -> None:
            f" Количество комнат: {result["rooms"]} \n Этаж: {result["floor"]}")
     bot.send_message(message.chat.id, mes)
     bot.delete_state(message.chat.id, message.chat.id)
+    clear()
