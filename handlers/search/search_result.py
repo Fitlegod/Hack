@@ -1,0 +1,1 @@
+result = {"city": 0, "money": 0, "rooms": 0, "second": 0, "floor": 0}
