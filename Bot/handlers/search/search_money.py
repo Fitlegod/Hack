@@ -1,6 +1,6 @@
-from loader import bot
+from Bot.loader import bot
 from . import search_result
-from states import States
+from Bot.states import States
 from telebot.types import Message
 
 @bot.message_handler(state=States.search_money)

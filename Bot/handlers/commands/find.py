@@ -1,6 +1,6 @@
-from loader import bot
+from Bot.loader import bot
 from telebot.types import Message
-from states import States
+from Bot.states import States
 
 
 @bot.message_handler(commands=['подобрать', 'find'])

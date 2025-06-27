@@ -1,4 +1,4 @@
-from loader import bot
+from Bot.loader import bot
 from telebot.types import Message
 
 @bot.message_handler(commands=["help", 'помощь'])
