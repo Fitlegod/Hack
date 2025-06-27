@@ -1,9 +1,65 @@
 <!DOCTYPE html>
-z<html lang="ru">
+<html>
 <head>
-  <meta charset="UTF-8">
+  <title>Карта новостроек</title>
+  <meta charset="utf-8" />
+  <style>
+      body {
+          font-family: Arial, Helvetica, sans-serif;
+          padding: 0;
+          margin: 0;
+      }
+      #map {
+          position: relative;
+          z-index: -1;
+          width: 100%;
+          height: 100vh;
+      }
+      .header__filters {
+          width: 250px;
+          position: absolute;
+          z-index: 1;
+          right: 0;
+          margin-top: 10%;
+          margin-right: 4%;
+
+
+
+          background: #fdfdfd;
+          border-radius: 20px;
+          border: 1px solid;
+
+          display: flex;
+          flex-direction: column;
+      }
+      .header__top {
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          row-gap: 30px;
+      }
+      select, input {
+
+          margin-top: 10px;
+          border-radius: 10px;
+          padding: 10px;
+         width: 100%;
+      }
+      input {
+          width: 90%;
+      }
+      h1 {
+          border-radius: 20px 20px 0 0;
+          padding: 20px;
+          margin: 0;
+          background: #1A1A1A;
+          color: #ffffff;
+          text-align: center;
+      }
+  </style>
   <link rel="stylesheet" href="./style/main.css">
-  <title>Проверка</title>
+
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=0052a09e-3633-4c3f-84c1-1c2309b4728b&lang=ru_RU" type="text/javascript"></script>
 </head>
 <body>
 
@@ -26,10 +82,10 @@ z<html lang="ru">
             <a href="#" class="side-menu__link">Сравнить</a>
           </li>
           <li class="side-menu__item">
-            <a href="./chekObyav.html" class="side-menu__link is-active">Проверить объект</a>
+            <a href="./chekObyav.html" class="side-menu__link">Проверить объект</a>
           </li>
           <li class="side-menu__item">
-            <a href="./interact.html" class="side-menu__link">Интерактивная карта</a>
+            <a href="" class="side-menu__link is-active">Интерактирвная карта</a>
           </li>
           <li class="side-menu__item">
             <a href="#" class="side-menu__link">Консультация специалиста</a>
@@ -94,107 +150,45 @@ z<html lang="ru">
       </div>
     </div>
   </header>
-  <main>
+  <main style="margin-top: 4rem;">
 
-    <section class="checkout" aria-labelledby="checkout">
-      <div class="checkout__inner container">
-        <div class="checkout__wrapper">
-          <h2 class="checkout__title">Проверить объявление</h2>
-          <div class="checkout__body form-check">
-            <input class="form-check__input" id="link" type="text" placeholder="Ссылка на объявление">
-            <button class="form-check__btn" id="btn">Проверить</button>
+    <section class="filters-ads" style="margin: 0" aria-labelledby="filters-ads">
+      <div class="filters-ads__inner " style="position: relative; z-index: 9000;}">
+
+
+        <header class="header" style="display: grid; grid-template-columns: 5fr 1fr;">
+          <div class="header__filters" >
+            <div class="header__top">
+              <input type="search" style="width: 100%;" placeholder="Искать...">
+              <label>Тип:
+                <select id="typeFilter">
+                  <option value="all">Все</option>
+                  <option value="new">Новостройка</option>
+                  <option value="used">Вторичка</option>
+                </select>
+              </label>
+              <label>Цена до:
+                <input type="number" id="priceFilter" value="3000" />
+              </label>
+            </div>
           </div>
-          <div id="res"></div>
-        </div>
+        </header>
+
+      <div id="map"></div>
+
+
+
       </div>
     </section>
 
 
-    <style>
-        h2 {
-            text-align: center;
-        }
-        .checkout {
-            padding: 0 50px;
-            margin-top: 3rem;
-        }
-      .checkout__body {
-          margin-top: 2rem;
-          display: grid;
-          grid-template-columns: 4fr 1fr;
-      }
-      .form-check__input {
-          border: 0;
-          height: 50px;
-          padding: 0 15px;
-          background: #e6e6e6;
-          border-radius: 40px 0 0  40px;
-      }
-      .form-check__btn {
-          background-color: #ffd11a;
-          border-radius: 0 40px 40px 0;
-      }
-
-      .res__data {
-          display: flex;
-          flex-direction: column;
-      }
-    </style>
 
   </main>
 </div>
 
 
 
+<script src="./script/map.js"></script>
 
-
-<!--<span class="res__address">Адрес: ${data.address}</span>-->
-
-<!--<span class="res__prise">Район: ${data.district}</span>-->
-
-<!--div.innerHTML = `Вот что мы нашли...<br>Адрес: ${data.address}<br>Цена: ${data.price} ₽<br>Заголовок: ${data.title}`;-->
-<script>
-    document.getElementById('btn').onclick = async () => {
-        const url = document.getElementById('link').value.trim();
-        const div = document.getElementById('res');
-        div.textContent = 'Проверка...';
-        try {
-            const resp = await fetch('/check-domclick?url=' + encodeURIComponent(url));
-            const data = await resp.json();
-            if (data.valid) {
-                div.innerHTML = `
-
-                  <div class="res__body">
-                    <div class="res__data">
-                      <span class="res__title">${data.title}</span>
-                      <span class="res__prise">Цена: ${data.price} рублей</span>
-                      <span class="res__address">Адресс: ${data.address}</span>
-                      <span class="res__encumbrances">Обременения: ${data.encumbrances}</span>
-                      <span class="res__description">Описание: ${data.description}</span>
-                      <span class="res__floar">Этаж: ${data.float}</span>
-                      <span class="res__year">Год постройки: ${data.year}</span>
-                      <div class="res__images">
-                          ${data.images?.map(url => `<img src="${url}" style="max-width: 200px; margin: 5px;">`).join('')}
-                      </div>
-
-
-                    </div>
-                    <div class="res__answer"></div>
-                  </div>
-
-
-                `;
-            } else {
-                div.innerHTML = `❌ Не прошёл проверку.<br>${data.reason || ''}`;
-            }
-        } catch (e) {
-            div.textContent = 'Ошибка запроса';
-
-        }
-    };
-
-
-
-</script>
 </body>
 </html>

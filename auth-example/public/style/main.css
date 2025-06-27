@@ -506,7 +506,8 @@ svg * {
   width: 3.125rem;
   height: 3.125rem;
   border: none;
-  background-color: var(--color-gray-60);
+  background: url("./../image/ava.jpg") no-repeat;
+  background-size: cover;
   border-radius: 50%;
 }
 .account__menu {
