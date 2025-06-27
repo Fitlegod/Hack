@@ -1,0 +1,24 @@
+@use '../helpers/index' as *;
+
+.header {
+  position:  fixed;
+  top: 0;
+  right: 0;
+  width: calc(100% - var(--sidebar-width));
+  background-color: var(--color-gray-10);
+
+  padding: rem(10) 0;
+
+  &__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__active {
+    display: flex;
+    align-items: center;
+    column-gap: rem(30);
+  }
+
+}

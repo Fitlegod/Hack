@@ -1,0 +1,8 @@
+@use "../helpers/index" as *;
+
+.logo {
+  font-size: fluid(50, 10);
+  &:hover {
+    color: inherit;
+  }
+}

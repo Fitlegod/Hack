@@ -1,0 +1,78 @@
+[
+  {
+    "type": "посуточно",
+    "room": 2,
+    "price": 3200,
+    "area": 30,
+    "city": "Сочи",
+    "address": "ул. Мира, дом 28",
+    "probability": 100,
+    "guests": 2,
+    "equipment": ["фен", "сплит", "плита"],
+    "title": "Квартира у моря",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  },
+  {
+    "type": "длительно",
+    "room": 3,
+    "price": 45000,
+    "area": 55,
+    "city": "Москва",
+    "address": "ул.ввапыывпвп Мира, дом 8",
+    "probability": 100,
+    "guests": 3,
+    "equipment": ["плита", "микроволновка", "стиралка"],
+    "title": "Квартира рядом с метро",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  },
+  {
+    "type": "купить",
+    "room": 2,
+    "price": 7200000,
+    "area": 75,
+    "city": "Казань",
+    "address": "ул. Мира, дом 28",
+    "probability": 100,
+    "guests": 4,
+    "equipment": ["утюг", "плита", "стиралка", "фен"],
+    "title": "Просторная квартира для семьи",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  },
+  {
+    "type": "длительно",
+    "room": 5,
+    "price": 38000,
+    "area": 40,
+    "city": "Новосибирск",
+    "address": "ул. Мира, дом 28",
+    "probability": 100,
+    "guests": 2,
+    "equipment": ["сплит", "микроволновка", "утюг"],
+    "title": "Уютная квартира с ремонтом",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  },
+  {
+    "type": "посуточно",
+    "price": 250,
+    "area": 28,
+    "city": "Санкт-Петербург",
+    "address": "ул. ра, дом 28",
+    "probability": 100,
+    "guests": 2,
+    "equipment": ["фен", "утюг", "плита"],
+    "title": "Квартира в историческом центре",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  },
+  {
+    "type": "купить",
+    "price": 900000,
+    "area": 85,
+    "city": "Екатеринбург",
+    "address": "ул. Мира, дом 66666",
+    "probability": 100,
+    "guests": 5,
+    "equipment": ["микроволновка", "сплит", "стиралка"],
+    "title": "Элитное жильё с авторским ремонтом",
+    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
+  }
+]

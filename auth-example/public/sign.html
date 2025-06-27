@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Future Tech</title>
+  <link rel="stylesheet" href="./style/main.css">
+</head>
+<body style="background-color: #000000;">
+
+
+
+<main class="auth">
+  <div class="image"></div>
+  <div class="auth__wrapper">
+    <div style="display: none" class="auth__section auth__section--register">
+
+      <form class="form form--register" id="register-form" novalidate>
+
+        <div class="form__message" id="register-message"></div>
+      </form>
+    </div>
+    <div class="auth__section auth__section--login">
+      <h2 class="auth__title">Вход</h2>
+      <form class="form form--login" id="login-form" novalidate>
+        <div class="form__group">
+          <label class="form__label" for="login-email">Email</label>
+          <input class="form__input" type="email" id="login-email" name="email" required />
+          <span class="form__error" id="error-login-email"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="login-password">Пароль</label>
+          <input class="form__input" type="password" id="login-password" name="password" required />
+          <span class="form__error" id="error-login-password"></span>
+        </div>
+        <span>нет аккаунта? <a href="auth.html">Зарегестироваться</a></span>
+        <button class="form__button" type="submit">Войти</button>
+        <div class="form__message" id="login-message"></div>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+@use '../helpers/index' as *;
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
+.property {
+  display: flex;
+  padding: rem(20) rem(20);
+  border-radius: rem(20);
+
+  column-gap: rem(20);
+
+
+  &:hover {
+    background-color: var(--color-gray-10);
+  }
+
+  img {
+    width: rem(250);
+    height: auto;
+
+    border-radius: rem(10);
+  }
+
+}

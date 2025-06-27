@@ -1,0 +1,46 @@
+@use "../helpers/index" as *;
+
+.window-platform {
+  display: flex;
+  flex-direction: row;
+}
+
+.side-menu {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  min-width: rem(300);
+  width: var(--sidebar-width);
+
+  border-right: var(--border);
+  border-right-width: rem(5);
+  background-color: var(--color-dark);
+
+  &__logo {
+    border-bottom: var(--border);
+    padding: rem(20) rem(20) rem(5);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: rem(40) rem(20);
+
+    flex-grow: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(25);
+  }
+
+  &___footer-configuration {
+
+  }
+}
