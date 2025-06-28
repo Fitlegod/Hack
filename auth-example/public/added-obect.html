@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Карта новостроек</title>
+  <meta charset="utf-8" />
+  <style>
+      body {
+          font-family: Arial, Helvetica, sans-serif;
+          padding: 0;
+          margin: 0;
+      }
+      .main__content {
+          margin-top: 30px;
+      }
+      select, input {
+
+          margin-top: 10px;
+          border-radius: 10px;
+          padding: 10px;
+          width: 100%;
+      }
+      input {
+          width: 90%;
+      }
+      h1 {
+          border-radius: 20px 20px 0 0;
+          padding: 20px;
+          margin: 0;
+          background: #1A1A1A;
+          color: #ffffff;
+          text-align: center;
+      }
+  </style>
+  <link rel="stylesheet" href="./style/main.css">
+
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=0052a09e-3633-4c3f-84c1-1c2309b4728b&lang=ru_RU" type="text/javascript"></script>
+  <style>
+      main {
+          margin-bottom: 50px;
+      }
+      body {
+          font-family: Arial, sans-serif;
+          background: #f6f6f6;
+          margin: 0;
+          padding: 0;
+      }
+      form {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+      }
+      .field-group {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 20px;
+      }
+
+      label {
+          font-weight: bold;
+          margin-bottom: 5px;
+          display: block;
+      }
+
+
+      input, select, textarea {
+          width: 100%;
+          padding: 8px 10px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          box-sizing: border-box;
+      }
+      .header {
+          background: none;
+      }
+      .container {
+          margin: 15px 20px;
+          padding: 20px;
+          background: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      }
+      input[type="file"] {
+          border: none;
+      }
+
+      textarea {
+          resize: vertical;
+      }
+
+      .button {
+          background-color: #ffd11a;
+          color: white;
+          border: none;
+          padding: 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s ease;
+      }
+
+      .button:hover {
+          background-color: #bc9a00;
+      }
+      .section{
+          padding: 20px 30px;
+          background-color: #ffffff;
+          border-radius: 15px;
+      }
+
+    .section__wrapper {
+        display: grid;
+        row-gap: 30px;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="window-platform">
+  <aside class="side-menu">
+    <a href="#" class="side-menu__logo logo">
+      <img src="image/logo.svg" width="150">
+    </a>
+    <div class="side-menu__body">
+      <nav class="side-menu__nawbar">
+        <ul class="side-menu__list">
+          <li class="side-menu__item">
+            <a href="index.html" class="side-menu__link">Главная страница</a>
+          </li>
+          <h4  style="margin: 0; color: #858585; font-weight: 600; font-size: 16px; text-align: left">Графики и таблицы</h4>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link">Объем сделок по месяцам</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link">Динамика цен по сегментам</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link">Просроченные объекты</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link">Источник трафика и заявок</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link">Модерация объектов</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="./interact.html" class="side-menu__link">Интерактирвная карта</a>
+          </li>
+          <li class="side-menu__item">
+            <a href="" class="side-menu__link"> карта</a>
+          </li>
+        </ul>
+      </nav>
+      <footer class="side-menu__footer">
+        <p class="side-menu__footer-configuration">
+          @anyway 2025
+        </p>
+      </footer>
+    </div>
+  </aside>
+  <header class="header">
+    <div class="header__container container">
+      <div class="header__wrapper">
+        <a href="./index.html" class="header__swiper">AI-помошник</a>
+        <div class="header__active">
+          <div class="header__active-user active-user">
+            <div class="added-object">
+              <a href="./added-obect.html" class="added-object__link" style=" font-weight: 600">Добавить объект +</a>
+            </div>
+            <button class="active-user">
+              <svg width="30" height="30" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.8741 30.3333H51.0964M20.8741 45.4444H32.2075M70 36C70 54.7778 54.7778 70 36 70C28.3069 70 2.00272 70 2.00272 70C2.00272 70 7.893 55.8564 5.53566 51.1141C3.27255 46.5612 2 41.4294 2 36C2 17.2223 17.2223 2 36 2C54.7778 2 70 17.2223 70 36Z" stroke="black" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="header__account account">
+            <button id="account__avatar" class="account__avatar">
+              <img src="" alt="">
+            </button>
+            <nav class="account__menu">
+              <ul class="account__list">
+                <li class="account__item">
+                  <a href="#" class="account__link">Профиль</a>
+                </li>
+                <li class="account__item">
+                  <a href="#" class="account__link">Еще пункт</a>
+                </li>
+                <li class="account__item">
+                  <a href="#" class="account__link">Настройки</a>
+                </li>
+                <li class="account__item">
+                  <a href="#" class="account__link exit">Выйти</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="main" style="margin-top: 10rem; padding: 0 30px;">
+
+    <section class="added">
+      <div class="main__wrapper">
+        <h3 class="main__title" style="text-align: center">
+          Добавьте новый объект
+        </h3>
+        <div class="main__content">
+          <form id="apartmentForm" method="POST" enctype="multipart/form-data">
+
+            <!-- 1. Основная информация -->
+            <div class="section">
+              <div class="field-group">
+                <h5>Основная информация</h5>
+                <div>
+                  <label for="title">Заголовок</label>
+                  <input type="text" id="title" name="title" required>
+                </div>
+                <div>
+                  <label for="rooms">Количество комнат</label>
+                  <select id="rooms" name="rooms" required>
+                    <option value="">Выберите</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5+</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="area">Площадь (м²)</label>
+                  <input type="number" id="area" name="area" required>
+                </div>
+                <div>
+                  <label for="floor">Этаж</label>
+                  <input type="number" id="floor" name="floor" required>
+                </div>
+                <div>
+                  <label for="floorsTotal">Этажность дома</label>
+                  <input type="number" id="floorsTotal" name="floorsTotal" required>
+                </div>
+                <div>
+                  <label for="class">Класс жилья</label>
+                  <select id="class" name="class" required>
+                    <option value="">Выберите</option>
+                    <option value="эконом">Эконом</option>
+                    <option value="комфорт">Комфорт</option>
+                    <option value="бизнес">Бизнес</option>
+                    <option value="элит">Элит</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="price">Цена (₽)</label>
+                  <input type="number" id="price" name="price" required>
+                </div>
+                <div>
+                  <label for="developer">Застройщик</label>
+                  <select id="developer" name="developer" required>
+                    <option value="">Выберите</option>
+                    <option value="DOGMA">DOGMA</option>
+                    <option value="ПОБЕДА">ПОБЕДА</option>
+                    <option value="АВАЛИН">АВАЛИН</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="section__wrapper">
+              <!-- 2. Изображения -->
+              <div class="section">
+                <h5>Фотографии</h5>
+                <div class="field-group">
+                  <div>
+                    <label for="images">Выберите фото квартиры</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Дополнительная информация -->
+              <div class="section">
+                <h5>Дополнительная информация</h5>
+                <div class="field-group">
+                  <div>
+                    <label for="address">Адрес</label>
+                    <input type="text" id="address" name="address" required>
+                  </div>
+                  <div>
+                    <label for="lat">Широта (lat)</label>
+                    <input type="text" id="lat" name="lat" required>
+                  </div>
+                  <div>
+                    <label for="lng">Долгота (lng)</label>
+                    <input type="text" id="lng" name="lng" required>
+                  </div>
+                  <div>
+                    <label for="link">Ссылка на объект</label>
+                    <input type="url" id="link" name="link">
+                  </div>
+                  <div style="grid-column: span 2;">
+                    <label for="description">Описание</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <button class="button" type="submit">Добавить квартиру</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+
+  </main>
+</div>
+
+
+
+<script src="./script/map.js"></script>
+
+</body>
+</html>

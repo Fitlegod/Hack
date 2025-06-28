@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: {              // Имя пользователя
+    name: {
         type: String,
         required: true,
         minlength: 2,
         maxlength: 15
     },
-    email: {             // Email — уникальный идентификатор
+    email: {
         type: String,
         required: true,
-        unique: true,      // Чтобы не было двух пользователей с одним email
+        unique: true,
         lowercase: true,
         trim: true
     },
-    passwordHash: {      // Хэш пароля (не сам пароль!)
+    passwordHash: {
         type: String,
         required: true
+    },
+    key: {                // 👈 Добавь это поле
+        type: String,
+        enum: ['user', 'admin'], // можно только 'user' или 'admin'
+        default: 'user'
     }
 }, { timestamps: true });
 
