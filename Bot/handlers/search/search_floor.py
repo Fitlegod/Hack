@@ -1,10 +1,11 @@
 from Bot.loader import bot
-from . import search_result
 from Bot.states import States
 from telebot.types import Message
+from Bot.loader import collection
 
 @bot.message_handler(state=States.search_floor)
 def search_money(message: Message) -> None:
-    search_result.result["rooms"] = message.text
+    filt = {"user-id": str(message.from_user.id)}
+    collection.update_one(filt, {"$set": {'rooms': str(message.text)}}, upsert=True)
     bot.send_message(message.chat.id, "На каком этаже вы ищите квартиру?")
     bot.set_state(message.chat.id, States.search_check, message.chat.id)
