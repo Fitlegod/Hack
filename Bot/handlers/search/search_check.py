@@ -11,13 +11,13 @@ def search_check(message: Message) -> None:
     params = collection.find_one(filt)
     print(params)
     city = params['city']
-    money = params['money']
+    price = params['price']
     floor = params['floor']
     rooms = params['rooms']
     bot.send_message(message.chat.id, f"Проверьте, правильно ли вы ввели параметры: \n"
                                       f"Город: {city},\n"
                                       f"Этаж: {floor},\n"
                                       f"Количество комнат: {rooms},\n"
-                                      f"Максимальная цена: {money}",
+                                      f"Максимальная цена: {price}",
                      reply_markup=check_keyboard())
 
