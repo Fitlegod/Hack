@@ -17,6 +17,8 @@ def search_main(call: CallbackQuery) -> None:
         "rooms": 0
                 }
             }
+    bot.call
     collection.update_one(filt, info, upsert=True)
     bot.set_state(call.message.chat.id, States.search_money, call.message.chat.id)
     return
+

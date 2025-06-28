@@ -3,8 +3,9 @@ from Bot.states import States
 from telebot.types import Message
 from Bot.keyboards.inline.check_keyboard import check_keyboard
 from Bot.loader import collection
+from Bot.command_list import comms
 
-@bot.message_handler(state=States.search_check)
+@bot.message_handler(state=States.search_check, func=lambda mess: mess.text not in comms)
 def search_check(message: Message) -> None:
     filt = {"user-id": str(message.from_user.id)}
     collection.update_one(filt, {"$set": {'floor': str(message.text)}}, upsert=True)
@@ -20,4 +21,4 @@ def search_check(message: Message) -> None:
                                       f"Количество комнат: {rooms},\n"
                                       f"Максимальная цена: {price}",
                      reply_markup=check_keyboard())
-
+    bot.delete_state(message.chat.id, message.chat.id)
