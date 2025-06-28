@@ -1,114 +1,75 @@
 require('dotenv').config(); // Загружаем .env
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const axios = require('axios');
-const cheerio = require('cheerio');
-const puppeteer = require('puppeteer');
-const authRoutes = require('./routes/auth');
+const { MongoClient } = require('mongodb');
+const { OpenAI } = require('openai');
 
+const authRoutes = require('./routes/auth'); // если есть
+const assistantRoute = require('./routes/assistant'); // если есть
 
 const app = express();
-
-
-// Разрешаем запросы с других адресов (например, с твоей фронтенд-страницы)
-app.use(cors());
-// Разбираем JSON в теле запроса
-app.use(express.json());
-// Роуты авторизации
-app.use('/api/auth', authRoutes);
-
 const PORT = process.env.PORT || 3000;
 
-// Подключаемся к MongoDB
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log('MongoDB connected');
-        // Запускаем сервер
-        app.listen(PORT, () => {
-            console.log(`Server started on port ${PORT}`);
-        });
-    })
-    .catch(err => console.error('MongoDB connection error:', err));
-
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
-});
-
+// Middleware
+app.use(cors());
+app.use(express.json());
 app.use(express.static('public'));
 
-app.get('/check-domclick', async (req, res) => {
-    const url = req.query.url;
-    if (!url || !url.includes('domclick.ru')) {
-        return res.json({ valid: false, reason: 'Ссылка не с ДомКлик' });
-    }
+// Роуты
+app.use('/api/auth', authRoutes); // если используется
+
+// MongoDB через Mongoose (для auth и стандартных моделей)
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ MongoDB (mongoose) connected'))
+    .catch(err => console.error('❌ Mongoose connection error:', err));
+
+// MongoDB через MongoClient (для ручных запросов)
+const client = new MongoClient(process.env.MONGO_URI);
+
+// Инициализация OpenAI
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// GPT-ассистент по поиску квартир
+app.post('/ask', async (req, res) => {
+    const userQuestion = req.body.question;
 
     try {
-        const browser = await puppeteer.launch({
-            headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-blink-features=AutomationControlled',
-            ]
+        const prompt = `
+Ты — ИИ-ассистент, который помогает найти квартиру. Вопрос от пользователя: "${userQuestion}".
+Ответь кратко, в виде списка или описания, а затем добавь список ID квартир, которые нужно найти в базе.
+
+Формат ответа:
+Описание: ...
+IDs: ["1", "3", "5"]
+    `;
+
+        const chat = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [{ role: "user", content: prompt }],
         });
-        const page = await browser.newPage();
 
-        // Настраиваем как настоящий браузер
-        await page.setUserAgent(
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
-            'AppleWebKit/537.36 (KHTML, like Gecko) ' +
-            'Chrome/125.0.6422.142 Safari/537.36'
-        );
-        await page.setViewport({ width: 1280, height: 800 });
+        const aiResponse = chat.choices[0].message.content;
+        const idsMatch = aiResponse.match(/IDs:\s*\[([^\]]+)\]/);
+        const ids = idsMatch
+            ? idsMatch[1].split(',').map(id => id.replace(/["']/g, '').trim())
+            : [];
 
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+        await client.connect();
+        const db = client.db('yourDatabaseName');
+        const apartments = db.collection('yourCollectionName');
 
-        // Ждём элементов: заголовок и адрес
-        await page.waitForSelector('h1', { timeout: 30000 });
-        await page.waitForSelector('a[data-e2e-id="building_uri"]', { timeout: 30000 });
-        await page.waitForSelector('div[class="JfVCK"]', { timeout: 30000 });
-        await page.waitForSelector('div[id="description"]', { timeout: 30000 });
-        await page.waitForSelector('div[class="g-core-slots-20d-1-0-1"]', { timeout: 30000 });
-        // await page.waitForSelector('span[style="color: rgb(115, 130, 149)"]', { timeout: 30000 });
-        // await page.waitForSelector('span[link-link-777-11-1-2]', { timeout: 30000 });
+        const listings = await apartments
+            .find({ _id: { $in: ids } })
+            .toArray();
 
-        const html = await page.content();
-        await browser.close();
-
-        console.log(html);
-        const $ = cheerio.load(html);
-
-        // Актуальные селекторы нужно проверить по DevTools!
-        const title = $('h1').first().text().trim();
-        const address = $('a[data-e2e-id="building_uri"]').text().trim();
-        const image = [];
-        $('picture[class="W1wsU"]').each((i, el) => {
-            const src = $(el).attr('src');
-            if (src && src.startsWith('http')) {
-                image.push(src);
-            }
-        });
-        const priceText = $('div[class="JfVCK"]').first().text().replace(/\D/g, '');
-        const price = parseInt(priceText, 10);
-        let description = $('div[id="description"]').text().trim();
-        description = description.replace(/Скрыть\s*$/, '');
-        // const float = $('span[style="color: rgb(115, 130, 149)"]').text().trim();
-        // const district = $('span[link-link-777-11-1-2]').text().trim();
-        // const square = $('span[class="upbHP VL_g2"]').text().trim();
-
-        // const marketPriceText = $('span[class="XBchw"]').first().text().replace(/\D/g, '');
-        // const marketPrice = parseInt(priceText, 10);
-
-
-        if (!title || !address || isNaN(price) || !description || !image ) {
-            return res.json({ valid: false, reason: 'Не удалось спарсить данные' });
-        }
-
-        res.json({ valid: true, title, address, price, description, image  });
-    } catch (err) {
-        console.error('Ошибка при парсинге ДомКлик:', err);
-
-        res.json({ valid: false, reason: 'Ошибка при парсинге ДомКлик' });
+        res.json({ answer: aiResponse, listings });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Ошибка при обработке запроса' });
     }
 });
+
+// Запуск сервера
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

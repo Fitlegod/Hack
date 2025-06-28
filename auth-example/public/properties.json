@@ -1,18 +1,5 @@
 [
   {
-    "type": "посуточно",
-    "room": 2,
-    "price": 3200,
-    "area": 30,
-    "city": "Сочи",
-    "address": "ул. Мира, дом 28",
-    "probability": 100,
-    "guests": 2,
-    "equipment": ["фен", "сплит", "плита"],
-    "title": "Квартира у моря",
-    "image": "https://avatars.mds.yandex.net/i?id=c2139faeb4b55c5e7dac183bb55d85a6_l-4219741-images-thumbs&n=13"
-  },
-  {
     "type": "длительно",
     "room": 3,
     "price": 45000,

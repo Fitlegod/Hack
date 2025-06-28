@@ -79,54 +79,6 @@ async function checkAllAddresses() {
     }
 }
 
-const averageSalePricesPerM2ByCity = {
-    "сочи": 250000,
-    "москва": 320000,
-    "уфа": 120000,
-    "тюмень": 100000,
-    "санкт-петербург": 280000,
-    "казань": 150000,
-    "екатеринбург": 140000,
-    "новосибирск": 130000,
-    "ростов-на-дону": 110000,
-    "владивосток": 180000,
-    "нижний новгород": 135000,
-    "пермь": 100000,
-    "воронеж": 95000,
-    "краснодар": 125000,
-};
-const averagePricesByCity = {
-    "сочи": 45000,
-    "москва": 80000,
-    "уфа": 32000,
-    "тюмень": 28000,
-    "казань": 35000,
-    "новосибирск": 38000,
-    "санкт-петербург": 50000,
-    "екатеринбург": 46000,
-    "ростов-на-дону": 30000,
-    "краснодар": 30000,
-    "владивосток": 40000,
-    "нижний новгород": 40000,
-    "пермь": 30000,
-    "воронеж": 27000
-};
-const averageDailyPricesByCity = {
-    "сочи": 4000,
-    "москва": 8000,
-    "уфа": 3200,
-    "тюмень": 2800,
-    "казань": 3000,
-    "новосибирск": 2500,
-    "санкт-петербург": 2500,
-    "екатеринбург": 2800,
-    "ростов-на-дону": 2200,
-    "краснодар": 1800,
-    "владивосток": 3000,
-    "нижний новгород": 2500,
-    "пермь": 2000,
-    "воронеж": 2000
-};
 
 
 function displayResults(results) {
@@ -190,11 +142,30 @@ function displayResults(results) {
 
 
 
+async function askAssistant() {
+    const question = document.getElementById('question').value;
+    const res = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+    });
 
-
-
-
-
+    const data = await res.json();
+    document.getElementById('response').innerHTML = `
+    <p><strong>Ответ:</strong> ${data.answer}</p>
+    <h3>Подходящие квартиры:</h3>
+    <ul>
+      ${data.listings.map(flat => `
+        <li>
+          <strong>${flat.title}</strong><br>
+          Цена: ${flat.price}<br>
+          Адрес: ${flat.address}<br>
+          <a href="${flat.link}" target="_blank">Подробнее</a>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+}
 
 
 
