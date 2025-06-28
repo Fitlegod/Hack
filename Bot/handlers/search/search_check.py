@@ -7,10 +7,9 @@ from Bot.command_list import comms
 
 @bot.message_handler(state=States.search_check, func=lambda mess: mess.text not in comms)
 def search_check(message: Message) -> None:
-    filt = {"user-id": str(message.from_user.id)}
+    filt = {"user-id": str(message.from_user.username)}
     collection.update_one(filt, {"$set": {'floor': str(message.text)}}, upsert=True)
     params = collection.find_one(filt)
-    print(params)
     city = params['city']
     price = params['price']
     floor = params['floor']

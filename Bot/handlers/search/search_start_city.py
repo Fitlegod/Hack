@@ -9,16 +9,7 @@ def search_main(call: CallbackQuery) -> None:
     bot.delete_state(call.message.chat.id, call.message.chat.id)
     bot.send_message(call.message.chat.id, "Прошу Вас ввести по порядку следующие данные:")
     bot.send_message(call.message.chat.id, "В каком городе ищите квартиру?")
-    filt = {"user-id": str(call.from_user.username)}
-    info = {"$set":{
-        "floor": 0,
-        "money": 0,
-        "city": 0,
-        "rooms": 0
-                }
-            }
-    bot.call
-    collection.update_one(filt, info, upsert=True)
+
     bot.set_state(call.message.chat.id, States.search_money, call.message.chat.id)
     return
 
