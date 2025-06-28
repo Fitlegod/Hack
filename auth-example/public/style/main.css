@@ -482,7 +482,7 @@ svg * {
 
 .header {
   position: fixed;
-  z-index: 11;
+  z-index: 50000;
   top: 0;
   right: 0;
   width: calc(100% - var(--sidebar-width));

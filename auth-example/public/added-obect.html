@@ -153,11 +153,11 @@
   <header class="header">
     <div class="header__container container">
       <div class="header__wrapper">
-        <a href="./index.html" class="header__swiper">AI-помошник</a>
+        <a href="./index.html" class="header__swiper">AI-помощник</a>
         <div class="header__active">
           <div class="header__active-user active-user">
             <div class="added-object">
-              <a href="./added-obect.html" class="added-object__link" style=" font-weight: 600">Добавить объект +</a>
+              <a href="./added-obect.html" class="added-object__link" style=" font-weight: 600">Добавить ЖК</a>
             </div>
             <button class="active-user">
               <svg width="30" height="30" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -198,7 +198,7 @@
           Добавьте новый объект
         </h3>
         <div class="main__content">
-          <form id="apartmentForm" method="POST" enctype="multipart/form-data">
+          <form id="apartmentForm" method="POST" enctype="multipart/form-data" action="./added-obect.html">
 
             <!-- 1. Основная информация -->
             <div class="section">
@@ -221,7 +221,7 @@
                 </div>
                 <div>
                   <label for="area">Площадь (м²)</label>
-                  <input type="number" id="area" name="area" required>
+                  <input type="number" step="0.01" id="area" name="area" required>
                 </div>
                 <div>
                   <label for="floor">Этаж</label>
@@ -251,7 +251,7 @@
                     <option value="">Выберите</option>
                     <option value="DOGMA">DOGMA</option>
                     <option value="ПОБЕДА">ПОБЕДА</option>
-                    <option value="АВАЛИН">АВАЛИН</option>
+                    <option value="АВАЛИН">AVALIN</option>
                   </select>
                 </div>
               </div>
@@ -308,6 +308,24 @@
 </div>
 
 
+<script>
+    document.getElementById('apartmentForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const response = await fetch('/api/apartments', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            window.location.href = './added-obect.html';
+        } else {
+            alert('Ошибка при добавлении');
+        }
+    });
+</script>
 
 
 <script src="./script/map.js"></script>
