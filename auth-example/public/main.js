@@ -84,36 +84,6 @@ async function checkAllAddresses() {
 function displayResults(results) {
     const container = document.getElementById('results');
     container.innerHTML = results.map(p => {
-        let displayedProb = p.probability;
-        const city = p.city.toLowerCase();
-
-        if (p.type === "длительно" && averagePricesByCity[city]) {
-            const percent = (p.price * 100) / averagePricesByCity[city];
-            if (100 - percent >= 25) {
-                displayedProb *= 0.7; // цена слишком низкая для длительной аренды
-            }
-        } else if (p.type === "посуточно" && averageDailyPricesByCity[city]) {
-            const percent = (p.price * 100) / averageDailyPricesByCity[city];
-            if (100 - percent >= 25) {
-                displayedProb *= 0.7; // цена слишком низкая для посуточной аренды
-            }
-        } else if (p.type === "купить" && averageSalePricesPerM2ByCity[city]) {
-            const percent = (p.price * 100) / averageSalePricesPerM2ByCity[city];
-            if (100 - percent >= 25) {
-                displayedProb *= 0.7; // цена слишком низкая для посуточной аренды
-            }
-        }
-
-        if (p.validAddress === false) {
-            displayedProb *= 0.4; // снижаем при неверном адресе
-        }
-
-        let color;
-        if (displayedProb  >= 80) color = 'green';
-        else if (displayedProb  < 80 && displayedProb  >= 55) color = 'yellow';
-        else if (displayedProb  < 55 && displayedProb  > 30) color = 'orange';
-        else color = 'red';
-
 
         return `
         <article class="property">
@@ -128,9 +98,7 @@ function displayResults(results) {
             </div>
           </div>
         </div>
-        <div class="property__verifications">
-          <p class="property__probability">Надёжность <span style="color:${color}">${displayedProb.toFixed(0)} %</span></p>
-        </div>
+       
       </article>
       `;
     }).join('');
