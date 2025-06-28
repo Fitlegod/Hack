@@ -482,6 +482,7 @@ svg * {
 
 .header {
   position: fixed;
+  z-index: 11;
   top: 0;
   right: 0;
   width: calc(100% - var(--sidebar-width));
@@ -492,6 +493,10 @@ svg * {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header__wrapper > a:first-child {
+  color: #cfa500;
 }
 .header__active {
   display: flex;

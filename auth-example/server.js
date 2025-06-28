@@ -7,7 +7,7 @@ const { MongoClient } = require('mongodb');
 const { OpenAI } = require('openai');
 
 const authRoutes = require('./routes/auth'); // если есть
-const assistantRoute = require('./routes/assistant'); // если есть
+const assistantRoute = require('./routes/apartments'); // если есть
 
 const app = express();
 const PORT = process.env.PORT || 3000;

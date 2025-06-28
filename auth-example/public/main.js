@@ -138,10 +138,6 @@ function displayResults(results) {
 
 
 
-
-
-
-
 async function askAssistant() {
     const question = document.getElementById('question').value;
     const res = await fetch('/ask', {
@@ -168,6 +164,21 @@ async function askAssistant() {
 }
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    const avatarBtn = document.getElementById('account__avatar');
+    const menu = document.querySelector('.account__menu');
 
+    avatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // предотвратим всплытие
+        menu.classList.toggle('active');
+    });
+
+    // Закрыть меню при клике вне его
+    document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !avatarBtn.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+});
 
 
