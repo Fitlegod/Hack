@@ -5,6 +5,18 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" href="./style/main.css">
   <style>
+      .main__content a {
+          background-color: #dcdcdc;
+          border-radius: 20px;
+          justify-content: center;
+          padding: 70px 10px;
+          font-size: 30px;
+          align-items: center;
+      }
+      .main__content a:hover {
+          color: #494949;
+          background-color: #959595;
+      }
       main {
           margin-bottom: 50px;
       }
@@ -117,6 +129,7 @@
           <li class="side-menu__item">
             <a href="index.html" class="side-menu__link">Главная страница</a>
           </li>
+
           <li class="side-menu__item">
             <a href="" class="side-menu__link">Объем сделок по месяцам</a>
           </li>
@@ -133,7 +146,7 @@
             <a href="" class="side-menu__link">Модерация объектов</a>
           </li>
           <li class="side-menu__item">
-            <a href="./interact.html" class="side-menu__link">Интерактирвная карта</a>
+            <a href="./interact.html" class="side-menu__link">Интерактивная карта</a>
           </li>
         </ul>
       </nav>
@@ -151,7 +164,7 @@
         <div class="header__active">
           <div class="header__active-user active-user">
             <div class="added-object">
-              <a href="./added-obect.html" class="added-object__link" style=" font-weight: 600">+ Добавить объект</a>
+              <a href="./added.html" class="added-object__link" style=" font-weight: 600">+ Добавить объект</a>
             </div>
             <button class="active-user">
               <svg width="30" height="30" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -191,108 +204,9 @@
         <h3 class="main__title" style="text-align: center">
           Добавьте новый объект
         </h3>
-        <div class="main__content">
-          <form id="apartmentForm" method="POST" enctype="multipart/form-data" action="./added-obect.html">
-
-            <!-- 1. Основная информация -->
-            <div class="section">
-              <div class="field-group">
-                <h5>Основная информация</h5>
-                <div>
-                  <label for="title">Заголовок</label>
-                  <input type="text" id="title" name="title" required>
-                </div>
-                <div>
-                  <label for="rooms">Количество комнат</label>
-                  <select id="rooms" name="rooms" required>
-                    <option value="">Выберите</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5+</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="area">Площадь (м²)</label>
-                  <input type="number" step="0.01" id="area" name="area" required>
-                </div>
-                <div>
-                  <label for="floor">Этаж</label>
-                  <input type="number" id="floor" name="floor" required>
-                </div>
-                <div>
-                  <label for="floorsTotal">Этажность дома</label>
-                  <input type="number" id="floorsTotal" name="floorsTotal" required>
-                </div>
-                <div>
-                  <label for="class">Класс жилья</label>
-                  <select id="class" name="class" required>
-                    <option value="">Выберите</option>
-                    <option value="эконом">Эконом</option>
-                    <option value="комфорт">Комфорт</option>
-                    <option value="бизнес">Бизнес</option>
-                    <option value="элит">Элит</option>
-                  </select>
-                </div>
-                <div>
-                  <label for="price">Цена (₽)</label>
-                  <input type="number" id="price" name="price" required>
-                </div>
-                <div>
-                  <label for="developer">Застройщик</label>
-                  <select id="developer" name="developer" required>
-                    <option value="">Выберите</option>
-                    <option value="DOGMA">DOGMA</option>
-                    <option value="ПОБЕДА">ПОБЕДА</option>
-                    <option value="АВАЛИН">AVALIN</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="section__wrapper">
-              <!-- 2. Изображения -->
-              <div class="section">
-                <h5>Фотографии</h5>
-                <div class="field-group">
-                  <div>
-                    <label for="images">Выберите фото квартиры</label>
-                    <input type="file" id="images" name="images" accept="image/*" multiple required>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 3. Дополнительная информация -->
-              <div class="section">
-                <h5>Дополнительная информация</h5>
-                <div class="field-group">
-                  <div>
-                    <label for="address">Адрес</label>
-                    <input type="text" id="address" name="address" required>
-                  </div>
-                  <div>
-                    <label for="lat">Широта (lat)</label>
-                    <input type="text" id="lat" name="lat" required>
-                  </div>
-                  <div>
-                    <label for="lng">Долгота (lng)</label>
-                    <input type="text" id="lng" name="lng" required>
-                  </div>
-                  <div>
-                    <label for="link">Ссылка на объект</label>
-                    <input type="url" id="link" name="link">
-                  </div>
-                  <div style="grid-column: span 2;">
-                    <label for="description">Описание</label>
-                    <textarea id="description" name="description" rows="4" required></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <button class="button" type="submit" style="color: #141414; font-weight: 600">Добавить квартиру</button>
-            </div>
-          </form>
+        <div class="main__content" style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 30px;">
+          <a href="#" class="main__add">+ Добавить ЖК</a>
+          <a href="./added-obect.html" class="main__add">+ Добавить квартиру/дом/помещение</a>
         </div>
       </div>
     </section>

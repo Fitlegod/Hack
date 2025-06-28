@@ -9,6 +9,20 @@
   <link rel="stylesheet" href="./style/main.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+      select {
+          padding: 10px;
+          border-radius: 10px;
+      }
+      #controls {
+          display: flex;
+          row-gap: 20px;
+          flex-direction: column;
+      }
+      .selects {
+          display: flex;
+          column-gap: 20px;
+          justify-content: center;
+      }
       body {
           font-family: Arial, sans-serif;
           padding: 40px;
@@ -153,32 +167,43 @@
         </div>
 
 
-        <div class="diagram__foot">
           <div class="diagram__body">
             <h4 style="text-align:center">Динамика цен по сегментам жилья</h4>
 
             <div id="controls">
-              <select id="regionSelect">
-                <option value="all">Все регионы</option>
-                <option value="Краснодар">Краснодар</option>
-                <option value="Ростов">Ростов</option>
-              </select>
+              <div class="selects">
+                <select id="regionSelect">
+                  <option value="all">Все регионы</option>
+                  <option value="Краснодар">Краснодар</option>
+                  <option value="Ростов">Ростов</option>
+                </select>
 
-              <select id="developerSelect">
-                <option value="all">Все застройщики</option>
-                <option value="DOGMA">DOGMA</option>
-                <option value="Победа">Победа</option>
-                <option value="Avalin">Avalin</option>
-              </select>
+                <select id="developerSelect">
+                  <option value="all">Все застройщики</option>
+                  <option value="DOGMA">DOGMA</option>
+                  <option value="Победа">Победа</option>
+                  <option value="Avalin">Avalin</option>
+                </select>
+              </div>
 
               <div class="chart-container">
                 <canvas id="priceTrendChart"></canvas>
               </div>
             </div>
-
-
           </div>
-        </div>
+          <div class="diagram__body">
+            <h4>Аудитория платформы</h4>
+
+            <div class="charts" style="display: flex;">
+              <div>
+                <canvas id="genderChart" width="250"></canvas>
+              </div>
+              <div>
+                <canvas id="ageChart"></canvas>
+              </div>
+            </div>
+          </div>
+
       </div>
     </section>
 

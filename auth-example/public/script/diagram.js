@@ -152,7 +152,7 @@ const developersChart = new Chart(diagramTree, {
             }
         }
     }
-});
+})
 
 
 
@@ -165,19 +165,19 @@ const chart = new Chart(diagramFour, {
             {
                 label: 'Эконом',
                 data: [55000, 56000, 56500, 57000, 57800, 58200],
-                borderColor: '#4e73df',
+                borderColor: '#141414',
                 tension: 0.3
             },
             {
                 label: 'Комфорт',
                 data: [72000, 73000, 73500, 74000, 75500, 76800],
-                borderColor: '#1cc88a',
+                borderColor: '#ffd11a',
                 tension: 0.3
             },
             {
                 label: 'Бизнес',
                 data: [95000, 97000, 99000, 100500, 102000, 103000],
-                borderColor: '#e74a3b',
+                borderColor: '#878787',
                 tension: 0.3
             }
         ]
@@ -220,4 +220,51 @@ document.getElementById('developerSelect').addEventListener('change', () => {
 });
 
 
+new Chart(document.getElementById('genderChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Мужчины', 'Женщины',],
+        datasets: [{
+            data: [58, 42],
+            backgroundColor: ['#ffd11a', '#141414']
+        }]
+    },
+    options: {
+        plugins: {
+            title: {
+                display: true,
+                text: 'Пол аудитории'
+            }
+        }
+    }
+});
 
+// 2. Возраст
+new Chart(document.getElementById('ageChart'), {
+    type: 'bar',
+    data: {
+        labels: ['18–24', '25–34', '35–44', '45–54', '55+'],
+        datasets: [{
+            label: 'Пользователи',
+            data: [15, 35, 28, 14, 8],
+            backgroundColor: '#ffd11a'
+        }]
+    },
+    options: {
+        plugins: {
+            title: {
+                display: true,
+                text: 'Возрастная структура'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Количество'
+                }
+            }
+        }
+    }
+});
