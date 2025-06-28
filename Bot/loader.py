@@ -10,3 +10,5 @@ db = client[config.DATABASE_NAME]
 collection = db[config.COLLECTION_NAME]
 storage = StateMemoryStorage()
 bot = TeleBot(token=config.BOT_TOKEN, state_storage=storage)
+db_b = client[config.DATABASE_NAME_BUILDS]
+collection_b = db_b[config.COLLECTION_NAME_BUILDS]
