@@ -1,3 +1,22 @@
+document.getElementById('apartmentForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const response = await fetch('/api/apartments', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (response.ok) {
+        window.location.href = './added-obect.html';
+    } else {
+        alert('Ошибка при добавлении');
+    }
+});
+
+
+
 let properties = [];
 
 fetch('properties.json')
