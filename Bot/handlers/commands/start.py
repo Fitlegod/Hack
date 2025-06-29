@@ -12,6 +12,8 @@ def start(message: Message) -> None:
         "price": 0,
         "city": 0,
         "rooms": 0,
+        'last-seen': 0,
         "liked": [],
-        "seen": []}}
+        "seen": [],
+        "saved": []}}
     collection.update_one(filt, info, upsert=True)

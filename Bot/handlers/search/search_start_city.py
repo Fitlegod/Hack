@@ -7,7 +7,7 @@ from Bot.loader import collection
 def search_main(call: CallbackQuery) -> None:
     bot.delete_message(call.message.chat.id, call.message.id)
     bot.delete_state(call.message.chat.id, call.message.chat.id)
-    bot.send_message(call.message.chat.id, "Прошу Вас ввести по порядку следующие данные:")
+    bot.send_message(call.message.chat.id, "Прошу Вас ввести по порядку следующие данные (если не важно, то укажите 0):")
     bot.send_message(call.message.chat.id, "В каком городе ищите квартиру?")
 
     bot.set_state(call.message.chat.id, States.search_money, call.message.chat.id)
