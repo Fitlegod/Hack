@@ -12,15 +12,15 @@ def look_for(call: CallbackQuery) -> None:
     filt = []
     if str(user['rooms']).isdigit():
         if int(user['rooms']) > 0:
-            filt.append({'rooms': int(user['rooms'])})
+            filt.append({'parameters.rooms': int(user['rooms'])})
     if str(user['city']).isalpha():
-        filt.append({'address':{'city': str(user['city'])}})
+        filt.append({'address.city': str(user['city'])})
     if str(user['price']).isdigit():
         if int(user['price']) >0:
-            filt.append({'parameters': {'price': {'$lt': int(user['price'])}}})
+            filt.append({'parameters.price': {'$lt': int(user['price'])}})
     if str(user['floor']).isdigit():
         if int(user['floor']) > 0:
-            filt.append({'floor': int(user['floor'])})
+            filt.append({'parameters.floor': int(user['floor'])})
     if filt:
         print(filt)
         filt = {'$and':filt}
@@ -29,8 +29,7 @@ def look_for(call: CallbackQuery) -> None:
     num = 0
     for x in collection_b.find(filt):
         num+= 1
-    print(num)
-    print(len(list(found)))
+    print(num, " ", len(list(found)))
     if num or len(list(found)):
         for x in collection_b.find(filt):
             if x['_id'] not in user['seen']:
