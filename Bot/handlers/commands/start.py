@@ -5,6 +5,7 @@ from Bot.loader import collection
 
 @bot.message_handler(commands=['start', 'старт'])
 def start(message: Message) -> None:
+    bot.delete_state(message.chat.id, message.chat.id)
     bot.send_message(message.chat.id, 'Что вы хотите?', reply_markup=start_keyboard())
     filt = {"user-id": str(message.from_user.username)}
     info = {"$set": {
