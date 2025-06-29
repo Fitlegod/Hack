@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все объекты — Buildy</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <style>
+        .objects-filters {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 18px 24px;
+            box-shadow: 0 2px 12px rgba(34,34,59,0.07);
+        }
+        .objects-filters select, .objects-filters input {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e1e5e9;
+            font-size: 1rem;
+            background: #fff;
+            color: #22223b;
+        }
+        .objects-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(34,34,59,0.07);
+            overflow: hidden;
+        }
+        .objects-table th, .objects-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+        }
+        .objects-table th {
+            background: #ffe066;
+            color: #22223b;
+            font-weight: 700;
+        }
+        .objects-table tr:last-child td {
+            border-bottom: none;
+        }
+        .object-type-label {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            background: #bfa900;
+            margin-right: 6px;
+        }
+        .object-type-flat { background: #4caf50; }
+        .object-type-complex { background: #1976d2; }
+        .object-img-thumb {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1.5px solid #e1e5e9;
+        }
+        @media (max-width: 900px) {
+            .objects-table th, .objects-table td { padding: 8px 6px; }
+            .objects-filters { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-wrapper">
+    <aside class="admin-aside">
+        <div class="logo-block">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                <circle cx="12" cy="12" r="10" fill="#22223b"/>
+                <circle cx="32" cy="12" r="10" fill="#ffe066"/>
+                <circle cx="12" cy="32" r="10" fill="#ffe066"/>
+                <circle cx="32" cy="32" r="10" fill="#22223b"/>
+            </svg>
+            <span class="logo-text">Buildy</span>
+        </div>
+        <nav class="admin-menu">
+            <a href="/admin/main" class="menu-item">Главная страница</a>
+            <a href="#" class="menu-item">Графики и таблицы</a>
+            <a href="#" class="menu-item">Объем сделок по месяцам</a>
+            <a href="#" class="menu-item">Динамика цен по сегментам</a>
+            <a href="#" class="menu-item">Просроченные объекты</a>
+            <a href="#" class="menu-item">Источник трафика и заявок</a>
+            <a href="#" class="menu-item">Модерация объектов</a>
+            <a href="#" class="menu-item">Интерактивная карта</a>
+            <a href="/admin/objects" class="menu-item active">Все объекты (ЖК и квартиры)</a>
+        </nav>
+        <div class="admin-footer">@anyway 2025</div>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <span class="ai-label">AI-помощник</span>
+            <a href="/admin/add-object" class="add-object">Добавить объект +</a>
+        </header>
+        <section>
+            <div class="objects-filters" id="objects-filters">
+                <select id="filter-type">
+                    <option value="all">Все типы</option>
+                    <option value="complex">ЖК</option>
+                    <option value="flat">Квартира</option>
+                </select>
+                <select id="filter-city"><option value="">Город</option></select>
+                <input type="text" id="filter-developer" placeholder="Застройщик">
+                <select id="filter-status"><option value="">Статус ЖК</option></select>
+                <input type="text" id="filter-search" placeholder="Поиск по названию или адресу...">
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="objects-table" id="objects-table">
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>Название / Заголовок</th>
+                            <th>Город</th>
+                            <th>Застройщик</th>
+                            <th>Статус</th>
+                            <th>Фото</th>
+                            <th>Адрес</th>
+                            <th>Цена</th>
+                            <th>Дата создания</th>
+                        </tr>
+                    </thead>
+                    <tbody id="objects-tbody">
+                        <tr><td colspan="9" style="text-align:center;opacity:0.7;">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+<script>
+// Получение и отображение объектов
+let allObjects = [];
+let filterOptions = { cities: [], developers: [], statuses: [] };
+
+async function fetchObjects() {
+    const [complexesRes, flatsRes] = await Promise.all([
+        fetch('/objects/complexes').then(r=>r.json()),
+        fetch('/objects/apartments').then(r=>r.json())
+    ]);
+    const complexes = (complexesRes.complexes || []).map(obj => ({
+        ...obj,
+        _type: 'complex',
+        _name: obj.name,
+        _city: obj.address?.city || '',
+        _developer: obj.developer || '',
+        _status: obj.status || '',
+        _img: obj.images?.[0]?.path || '',
+        _address: obj.address?.street || '',
+        _price: '',
+        _created: obj.createdAt ? new Date(obj.createdAt) : null
+    }));
+    const flats = (flatsRes.apartments || []).map(obj => ({
+        ...obj,
+        _type: 'flat',
+        _name: obj.title,
+        _city: obj.address?.city || '',
+        _developer: obj.developer || '',
+        _status: '',
+        _img: obj.images?.[0]?.path || '',
+        _address: obj.address?.street || '',
+        _price: obj.parameters?.price ? obj.parameters.price.toLocaleString('ru-RU') + ' ₽' : '',
+        _created: obj.createdAt ? new Date(obj.createdAt) : null
+    }));
+    allObjects = [...complexes, ...flats];
+    buildFilterOptions();
+    renderTable();
+}
+
+function buildFilterOptions() {
+    const cities = Array.from(new Set(allObjects.map(o=>o._city).filter(Boolean))).sort();
+    const developers = Array.from(new Set(allObjects.map(o=>o._developer).filter(Boolean))).sort();
+    const statuses = Array.from(new Set(allObjects.filter(o=>o._type==='complex').map(o=>o._status).filter(Boolean))).sort();
+    filterOptions = { cities, developers, statuses };
+    const citySel = document.getElementById('filter-city');
+    citySel.innerHTML = '<option value="">Город</option>' + cities.map(c=>`<option>${c}</option>`).join('');
+    const devSel = document.getElementById('filter-developer');
+    devSel.innerHTML = '<option value="">Застройщик</option>' + developers.map(d=>`<option>${d}</option>`).join('');
+    const statusSel = document.getElementById('filter-status');
+    statusSel.innerHTML = '<option value="">Статус ЖК</option>' + statuses.map(s=>`<option>${s}</option>`).join('');
+}
+
+function renderTable() {
+    const type = document.getElementById('filter-type').value;
+    const city = document.getElementById('filter-city').value;
+    const developer = document.getElementById('filter-developer').value.trim();
+    const status = document.getElementById('filter-status').value;
+    const search = document.getElementById('filter-search').value.trim().toLowerCase();
+    let filtered = allObjects;
+    if (type !== 'all') filtered = filtered.filter(o=>o._type===type);
+    if (city) filtered = filtered.filter(o=>o._city===city);
+    if (developer) filtered = filtered.filter(o=>o._developer===developer);
+    if (status) filtered = filtered.filter(o=>o._status===status);
+    if (search) filtered = filtered.filter(o=>
+        (o._name && o._name.toLowerCase().includes(search)) ||
+        (o._address && o._address.toLowerCase().includes(search))
+    );
+    const tbody = document.getElementById('objects-tbody');
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;opacity:0.7;">Нет данных</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filtered.map(o=>`
+        <tr>
+            <td><span class="object-type-label object-type-${o._type}">${o._type==='complex'?'ЖК':'Квартира'}</span></td>
+            <td>${o._name || ''}</td>
+            <td>${o._city || ''}</td>
+            <td>${o._developer || ''}</td>
+            <td>${o._status || ''}</td>
+            <td>${o._img ? `<img src="${o._img}" class="object-img-thumb">` : ''}</td>
+            <td>${o._address || ''}</td>
+            <td>${o._price || ''}</td>
+            <td>${o._created ? o._created.toLocaleDateString('ru-RU') : ''}</td>
+        </tr>
+    `).join('');
+}
+
+document.getElementById('objects-filters').addEventListener('input', renderTable);
+window.addEventListener('DOMContentLoaded', fetchObjects);
+</script>
+</body>
+</html> 

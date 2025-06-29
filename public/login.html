@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fffbe6 0%, #ffe066 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: #fffde7;
+            padding: 2.5rem 2rem 2rem 2rem;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(255, 224, 102, 0.18), 0 1.5px 8px rgba(34,34,59,0.07);
+            width: 100%;
+            max-width: 410px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .header h1 {
+            color: #22223b;
+            margin-bottom: 0.5rem;
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            color: #bfa900;
+            font-size: 1.08rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #22223b;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 14px;
+            border: 2px solid #ffe066;
+            border-radius: 10px;
+            font-size: 1.08rem;
+            background: #fff;
+            color: #22223b;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 1px 4px rgba(255, 224, 102, 0.08);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffd43b;
+            box-shadow: 0 0 0 2px #ffe06655;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ffe066 0%, #ffd43b 100%);
+            color: #22223b;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.13rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 224, 102, 0.18);
+            transition: background 0.2s, transform 0.18s, box-shadow 0.18s;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #ffd43b 0%, #ffe066 100%);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 4px 16px rgba(255, 224, 102, 0.22);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 1.2rem;
+        }
+
+        .link a {
+            color: #bfa900;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .link a:hover {
+            color: #ffd43b;
+            text-decoration: underline;
+        }
+
+        .error {
+            background: #fff3cd;
+            color: #bfa900;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            border: 1.5px solid #ffe066;
+        }
+
+        .success {
+            background: #eafbe0;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            border: 1.5px solid #b6e388;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .spinner {
+            border: 2px solid #fffbe6;
+            border-top: 2px solid #ffd43b;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Авторизация</h1>
+            <p>Войдите в свой аккаунт</p>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <input type="text" id="login" name="login" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <span class="btn-text">Войти</span>
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </button>
+        </form>
+
+        <div class="link">
+            <p>Нет аккаунта? <a href="/registration.html">Зарегистрироваться</a></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const loading = submitBtn.querySelector('.loading');
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                btnText.style.display = 'none';
+                loading.style.display = 'block';
+                submitBtn.disabled = true;
+            } else {
+                btnText.style.display = 'block';
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+
+            setLoading(true);
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ login, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccess('Авторизация успешна! Перенаправление...');
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    setTimeout(() => {
+                        window.location.href = '/admin/main';
+                    }, 2000);
+                } else {
+                    showError(data.message || 'Ошибка авторизации');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html> 

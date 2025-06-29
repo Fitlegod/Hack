@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить объект</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <style>
+        body {
+            background: #f7f7fa;
+        }
+        .add-object-center {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+        }
+        .add-btns {
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .big-btn {
+            font-size: 1.3rem;
+            padding: 2.2rem 3.5rem;
+            border-radius: 18px;
+            background: #ffe066;
+            color: #22223b;
+            border: none;
+            font-weight: 700;
+            box-shadow: 0 4px 24px rgba(34,34,59,0.07);
+            cursor: pointer;
+            transition: background 0.2s, transform 0.18s;
+        }
+        .big-btn:hover {
+            background: #ffd43b;
+            transform: translateY(-2px) scale(1.03);
+        }
+        .add-form {
+            width: 100%;
+            max-width: 1200px;
+            background: transparent;
+            border-radius: 18px;
+            padding: 32px 24px 24px 24px;
+            margin-top: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.4s;
+        }
+        .add-form.active {
+            display: flex;
+        }
+        .form-section-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(34,34,59,0.07);
+            padding: 28px;
+            border: 1px solid #f0f0f0;
+        }
+        .form-section-card h3 {
+            font-size: 1.2rem;
+            color: #22223b;
+            margin-bottom: 20px;
+            margin-top: 0;
+            font-weight: 700;
+            border-bottom: 2px solid #ffe066;
+            padding-bottom: 8px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 0;
+        }
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #22223b;
+            font-size: 0.95rem;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 14px;
+            border-radius: 10px;
+            border: 1.5px solid #e1e5e9;
+            font-size: 1rem;
+            background: #fff;
+            color: #22223b;
+            transition: all 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #ffe066;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 224, 102, 0.1);
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .checkbox-group label:hover {
+            background: #e9ecef;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin: 0;
+        }
+        .form-actions {
+            display: flex;
+            gap: 18px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(34,34,59,0.07);
+        }
+        .form-actions button {
+            padding: 14px 32px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: #ffe066;
+            color: #22223b;
+            transition: all 0.2s;
+        }
+        .form-actions .cancel {
+            background: #e1e5e9;
+            color: #22223b;
+        }
+        .form-actions button:hover {
+            background: #ffd43b;
+            transform: translateY(-1px);
+        }
+        .form-actions .cancel:hover {
+            background: #bfc1c7;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .gallery img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e1e5e9;
+            transition: border-color 0.2s;
+        }
+        .gallery img:hover {
+            border-color: #ffe066;
+        }
+        .dropzone {
+            border: 2px dashed #ffe066;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            color: #bfa900;
+            background: #fffbe6;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .dropzone.dragover {
+            border-color: #ffd43b;
+            background: #fff9c4;
+            transform: scale(1.02);
+        }
+        .dropzone:hover {
+            border-color: #ffd43b;
+            background: #fff9c4;
+        }
+        .stages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .stage-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        .stage-item button {
+            background: #e57373;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .stage-item button:hover {
+            background: #d32f2f;
+        }
+        .add-stage-btn {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+        .add-stage-btn:hover {
+            background: #388e3c;
+            transform: translateY(-1px);
+        }
+        @media (max-width: 768px) {
+            .add-form, .add-object-center { 
+                max-width: 98vw; 
+                padding: 12px; 
+            }
+            .form-section-card {
+                padding: 20px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .stage-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .big-btn { 
+                width: 100%; 
+                min-width: 220px; 
+            }
+        }
+        /* CSS для pop-up */
+        .toast-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            min-width: 320px;
+            max-width: 90vw;
+            padding: 32px 48px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(34,34,59,0.18);
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            text-align: center;
+        }
+        .toast-popup.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .toast-success {
+            background: linear-gradient(90deg, #4caf50 60%, #43e97b 100%);
+        }
+        .toast-error {
+            background: linear-gradient(90deg, #e53935 60%, #ff7675 100%);
+        }
+    </style>
+</head>
+<body>
+<div class="admin-wrapper">
+    <aside class="admin-aside">
+        <div class="logo-block">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                <circle cx="12" cy="12" r="10" fill="#22223b"/>
+                <circle cx="32" cy="12" r="10" fill="#ffe066"/>
+                <circle cx="12" cy="32" r="10" fill="#ffe066"/>
+                <circle cx="32" cy="32" r="10" fill="#22223b"/>
+            </svg>
+            <span class="logo-text">Buildy</span>
+        </div>
+        <nav class="admin-menu">
+            <a href="/admin/main" class="menu-item">Главная страница</a>
+            <a href="#" class="menu-item">Графики и таблицы</a>
+            <a href="#" class="menu-item">Объем сделок по месяцам</a>
+            <a href="#" class="menu-item">Динамика цен по сегментам</a>
+            <a href="#" class="menu-item">Просроченные объекты</a>
+            <a href="#" class="menu-item">Источник трафика и заявок</a>
+            <a href="#" class="menu-item">Модерация объектов</a>
+            <a href="#" class="menu-item">Интерактивная карта</a>
+            <a href="/admin/objects" class="menu-item">Все объекты (ЖК и квартиры)</a>
+        </nav>
+        <div class="admin-footer">@anyway 2025</div>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <span class="ai-label">AI-помощник</span>
+            <a href="/admin/add-object" class="add-object">Добавить объект +</a>
+            <div class="admin-profile">
+                <label for="avatar-upload" class="avatar-upload-label" title="Загрузить аватар">
+                    <input type="file" id="avatar-upload" accept="image/*" style="display:none">
+                    <img src="" alt="profile" class="profile-img" id="profile-img">
+                    <span class="avatar-upload-icon">&#9998;</span>
+                </label>
+            </div>
+        </header>
+        <section>
+            <div class="add-object-center">
+                <div class="add-btns">
+                    <button class="big-btn" id="show-jk">Добавить ЖК</button>
+                    <button class="big-btn" id="show-flat">Добавить квартиру</button>
+                </div>
+                <form class="add-form" id="form-jk" autocomplete="off">
+                    <h2>Добавить ЖК</h2>
+                    
+                    <div class="form-section-card">
+                        <h3>Основная информация</h3>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Название ЖК *</label><input type="text" name="jk_name" required></div>
+                            <div class="form-group"><label>Застройщик *</label><input type="text" name="developer" id="jk-developer" required></div>
+                            <div class="form-group"><label>Статус *</label><select name="status" required><option value="Планируется">Планируется</option><option value="Строится">Строится</option><option value="Построен">Построен</option></select></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Адрес</h3>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Улица *</label><input type="text" name="street" required></div>
+                            <div class="form-group"><label>Город *</label><input type="text" name="city" required></div>
+                            <div class="form-group"><label>Индекс *</label><input type="text" name="zip" required pattern="[0-9]{6}"></div>
+                        </div>
+                        <div class="form-group"><label>Координаты (lat, lng) *</label><input type="text" name="coords" placeholder="55.7558, 37.6176" required pattern="^-?\d{1,3}\.\d+, ?-?\d{1,3}\.\d+$"></div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Этапы строительства</h3>
+                        <div class="stages-list" id="stages-list"></div>
+                        <button type="button" id="add-stage" class="add-stage-btn">Добавить этап</button>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Удобства</h3>
+                        <div class="form-group">
+                            <div class="checkbox-group" id="jk-amenities"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Фотографии ЖК</h3>
+                        <div class="form-group">
+                            <div class="dropzone" id="jk-photo-drop">Перетащите фото или кликните для выбора</div>
+                            <div class="gallery" id="jk-gallery"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit">Сохранить ЖК</button>
+                        <button type="button" class="cancel" onclick="hideForms()">Отменить</button>
+                    </div>
+                </form>
+                <form class="add-form active" id="form-flat" autocomplete="off">
+                    <h2>Добавить квартиру</h2>
+                    
+                    <div class="form-section-card">
+                        <h3>Основная информация</h3>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Заголовок объявления *</label><input type="text" name="title" required></div>
+                            <div class="form-group"><label>Класс жилья *</label><select name="housing_class" id="flat-class" required></select></div>
+                            <div class="form-group"><label>Застройщик</label><input type="text" name="developer" id="flat-developer"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Параметры квартиры</h3>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Комнат *</label><input type="number" name="rooms" min="1" max="10" required></div>
+                            <div class="form-group"><label>Площадь м² *</label><input type="number" name="area" min="10" max="1000" required></div>
+                            <div class="form-group"><label>Этаж *</label><input type="number" name="floor" min="1" max="100" required></div>
+                            <div class="form-group"><label>Всего этажей *</label><input type="number" name="max_floor" min="1" max="100" required></div>
+                            <div class="form-group"><label>Цена в рублях *</label><input type="number" name="price" min="10000" required></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Адрес</h3>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Улица *</label><input type="text" name="street" required></div>
+                            <div class="form-group"><label>Город *</label><input type="text" name="city" required></div>
+                            <div class="form-group"><label>Индекс *</label><input type="text" name="zip" required pattern="[0-9]{6}"></div>
+                            <div class="form-group"><label>Корпус</label><input type="text" name="block"></div>
+                        </div>
+                        <div class="form-group"><label>Координаты (lat, lng) *</label><input type="text" name="coords" placeholder="55.7558, 37.6176" required pattern="^-?\d{1,3}\.\d+, ?-?\d{1,3}\.\d+$"></div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Ссылка и описание</h3>
+                        <div class="form-group"><label>Ссылка на объявление *</label><input type="url" name="url" required></div>
+                        <div class="form-group"><label>Описание</label><textarea name="desc" placeholder="Подробное описание квартиры..."></textarea></div>
+                    </div>
+                    
+                    <div class="form-section-card">
+                        <h3>Фотографии квартиры</h3>
+                        <div class="form-group">
+                            <div class="dropzone" id="flat-photo-drop">Перетащите фото или кликните для выбора</div>
+                            <div class="gallery" id="flat-gallery"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit">Сохранить квартиру</button>
+                        <button type="button" class="cancel" onclick="hideForms()">Отменить</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+<!-- Pop-up уведомление -->
+<div id="toast-popup" class="toast-popup"></div>
+<script>
+// --- Плавное появление форм ---
+const showJK = document.getElementById('show-jk');
+const showFlat = document.getElementById('show-flat');
+const formJK = document.getElementById('form-jk');
+const formFlat = document.getElementById('form-flat');
+function hideForms() {
+    formJK.classList.remove('active');
+    formFlat.classList.remove('active');
+}
+showJK.onclick = () => { hideForms(); formJK.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); };
+showFlat.onclick = () => { hideForms(); formFlat.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); };
+// --- Динамические селекты (заглушки) ---
+const developers = ["DOGMA", "Победа", "Avalin"];
+const housingClass = ["Эконом", "Комфорт", "Бизнес", "Премиум"];
+function fillSelect(id, arr) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">Выберите...</option>' + arr.map(v=>`<option>${v}</option>`).join('');
+}
+fillSelect('jk-developer', developers);
+fillSelect('flat-developer', ["", ...developers]);
+fillSelect('flat-class', housingClass);
+// --- Удобства (заглушки) ---
+const amenities = ["Детская площадка", "Парковка", "Фитнес-зал", "Бассейн", "Магазин", "Школа"];
+const amenityBox = document.getElementById('jk-amenities');
+amenities.forEach(a => {
+    const label = document.createElement('label');
+    label.style.marginRight = '12px';
+    label.innerHTML = `<input type='checkbox' name='amenities' value='${a}'> ${a}`;
+    amenityBox.appendChild(label);
+});
+// --- Этапы ---
+const stagesList = document.getElementById('stages-list');
+document.getElementById('add-stage').onclick = function() {
+    const div = document.createElement('div');
+    div.className = 'stage-item';
+    div.innerHTML = `
+        <div class='form-group'><input type='text' name='stage_name[]' placeholder='Название этапа' required></div>
+        <div class='form-group'><input type='date' name='stage_start[]' required></div>
+        <div class='form-group'><input type='date' name='stage_end[]' required></div>
+        <button type='button' onclick='this.parentNode.remove()'>✕</button>
+    `;
+    stagesList.appendChild(div);
+};
+// --- Drag'n'drop для фото ---
+function setupDropzone(dropId, galleryId) {
+    const drop = document.getElementById(dropId);
+    const gallery = document.getElementById(galleryId);
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+    drop.addEventListener('dragleave', e => { drop.classList.remove('dragover'); });
+    drop.addEventListener('drop', e => {
+        e.preventDefault(); drop.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files, gallery);
+    });
+    drop.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.accept = 'image/*';
+        input.onchange = e => handleFiles(e.target.files, gallery);
+        input.click();
+    });
+}
+function handleFiles(files, gallery) {
+    Array.from(files).forEach(file => {
+        // Проверяем размер файла (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой. Максимальный размер: 5MB');
+            return;
+        }
+        // Проверяем тип файла
+        if (!file.type.startsWith('image/')) {
+            alert('Пожалуйста, выберите изображение');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('type', 'object');
+        
+        console.log('Отправляем файл с типом: object');
+        
+        // Показываем индикатор загрузки
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = 'width:64px;height:64px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#666;';
+        loadingDiv.textContent = '...';
+        gallery.appendChild(loadingDiv);
+        // Сразу показываем превью base64
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.opacity = '0.7';
+            gallery.appendChild(img);
+            // После загрузки на сервер — делаем img ярким
+            fetch('/upload-image?type=object', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Определяем, какая форма активна
+                    const activeForm = formJK.classList.contains('active') ? formJK : formFlat;
+                    
+                    // Добавляем скрытое поле для формы
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'images[]';
+                    hiddenInput.value = data.imagePath;
+                    // Добавляем поле прямо в активную форму
+                    activeForm.appendChild(hiddenInput);
+                    img.style.opacity = '1';
+                    console.log('Изображение загружено:', data.imagePath);
+                } else {
+                    img.remove();
+                    alert('Ошибка загрузки: ' + data.error);
+                }
+            })
+            .catch(error => {
+                img.remove();
+                alert('Ошибка загрузки изображения');
+            })
+            .finally(() => {
+                loadingDiv.remove();
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+}
+setupDropzone('jk-photo-drop', 'jk-gallery');
+setupDropzone('flat-photo-drop', 'flat-gallery');
+// --- Валидация и отправка форм ---
+[formJK, formFlat].forEach(form => {
+    form.onsubmit = async function(e) {
+        e.preventDefault();
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        
+        // Собираем данные формы
+        const formData = new FormData(form);
+        
+        // Собираем изображения из скрытых полей
+        const imageInputs = form.querySelectorAll('input[name="images[]"]');
+        const images = Array.from(imageInputs).map(input => input.value).filter(Boolean);
+        
+        console.log('Найдено изображений:', images.length);
+        console.log('Пути изображений:', images);
+        
+        // Создаем объект данных для отправки
+        const data = {};
+        
+        // Копируем все поля формы
+        for (let [key, value] of formData.entries()) {
+            if (key === 'images[]') continue; // Пропускаем старые поля images
+            data[key] = value;
+        }
+        
+        // Добавляем изображения
+        data.images = images;
+        
+        console.log('Данные для отправки:', data);
+        
+        let url = form === formJK ? '/objects/add-complex' : '/objects/add-apartment';
+        
+        // Для ЖК: этапы
+        if (form === formJK) {
+            // Собираем этапы
+            const stageNames = Array.from(form.querySelectorAll('input[name="stage_name[]"]')).map(i=>i.value);
+            const stageStarts = Array.from(form.querySelectorAll('input[name="stage_start[]"]')).map(i=>i.value);
+            const stageEnds = Array.from(form.querySelectorAll('input[name="stage_end[]"]')).map(i=>i.value);
+            
+            data.stage_name = stageNames;
+            data.stage_start = stageStarts;
+            data.stage_end = stageEnds;
+        }
+        
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await resp.json();
+            if (result.success) {
+                showToast('Данные успешно отправлены!', 'success');
+                form.reset();
+                // Очищаем галерею
+                const gallery = form.querySelector('.gallery');
+                if (gallery) gallery.innerHTML = '';
+                if (form === formJK) hideForms();
+            } else {
+                showToast('Ошибка: ' + (result.message || 'Не удалось отправить'), 'error');
+            }
+        } catch (err) {
+            showToast('Ошибка отправки: ' + err.message, 'error');
+        }
+    };
+});
+// Аватар: загрузка через сервер
+const avatarInput = document.getElementById('avatar-upload');
+const profileImg = document.getElementById('profile-img');
+
+function loadAvatar() {
+    const avatar = localStorage.getItem('avatar');
+    if (avatar) {
+        profileImg.src = avatar;
+    } else {
+        profileImg.src = 'https://randomuser.me/api/portraits/lego/1.jpg';
+    }
+}
+loadAvatar();
+
+avatarInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Проверяем размер файла (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер: 5MB');
+        return;
+    }
+    
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите изображение');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', 'avatar');
+    
+    // Показываем индикатор загрузки
+    profileImg.style.opacity = '0.5';
+    
+    fetch('/upload-image?type=avatar', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Сохраняем путь к изображению в localStorage
+            localStorage.setItem('avatar', data.imagePath);
+            loadAvatar();
+            console.log('Изображение загружено:', data.imagePath);
+        } else {
+            alert('Ошибка загрузки: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки:', error);
+        alert('Ошибка загрузки изображения');
+    })
+    .finally(() => {
+        // Восстанавливаем прозрачность
+        profileImg.style.opacity = '1';
+    });
+});
+// Pop-up уведомление
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast-popup');
+    toast.textContent = message;
+    toast.className = 'toast-popup show ' + (type === 'success' ? 'toast-success' : 'toast-error');
+    setTimeout(() => {
+        toast.className = 'toast-popup';
+    }, 3000);
+}
+</script>
+</body>
+</html> 

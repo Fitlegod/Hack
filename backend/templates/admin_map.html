@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная карта — Buildy</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <style>
+        .map-filters {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 20px;
+            box-shadow: 0 2px 12px rgba(34,34,59,0.07);
+            align-items: center;
+        }
+        .map-filters select, .map-filters input {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e1e5e9;
+            font-size: 1rem;
+            background: #fff;
+            color: #22223b;
+        }
+        .map-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+        .map-toggle input[type="checkbox"] {
+            width: 36px;
+            height: 20px;
+            accent-color: #ffe066;
+        }
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 18px;
+            box-shadow: 0 2px 12px rgba(34,34,59,0.07);
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) {
+            #map { height: 350px; }
+            .map-filters { flex-direction: column; gap: 10px; }
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #e1e5e9;
+            border-radius: 34px;
+            transition: .3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: #ffe066;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 2px 8px rgba(34,34,59,0.10);
+        }
+        .switch input:checked + .slider {
+            background: #ffe066;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(20px);
+            background: #22223b;
+        }
+    </style>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=0052a09e-3633-4c3f-84c1-1c2309b4728b&lang=ru_RU" type="text/javascript"></script>
+</head>
+<body>
+<div class="admin-wrapper">
+    <aside class="admin-aside">
+        <div class="logo-block">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                <circle cx="12" cy="12" r="10" fill="#22223b"/>
+                <circle cx="32" cy="12" r="10" fill="#ffe066"/>
+                <circle cx="12" cy="32" r="10" fill="#ffe066"/>
+                <circle cx="32" cy="32" r="10" fill="#22223b"/>
+            </svg>
+            <span class="logo-text">Buildy</span>
+        </div>
+        <nav class="admin-menu">
+            <a href="/admin/main" class="menu-item">Главная страница</a>
+            <a href="#" class="menu-item">Графики и таблицы</a>
+            <a href="#" class="menu-item">Объем сделок по месяцам</a>
+            <a href="#" class="menu-item">Динамика цен по сегментам</a>
+            <a href="#" class="menu-item">Просроченные объекты</a>
+            <a href="#" class="menu-item">Источник трафика и заявок</a>
+            <a href="#" class="menu-item">Модерация объектов</a>
+            <a href="/admin/map" class="menu-item active">Интерактивная карта</a>
+            <a href="/admin/objects" class="menu-item">Все объекты (ЖК и квартиры)</a>
+        </nav>
+        <div class="admin-footer">@anyway 2025</div>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <span class="ai-label">AI-помощник</span>
+            <a href="/admin/add-object" class="add-object">Добавить объект +</a>
+        </header>
+        <section>
+            <div class="map-filters">
+                <div class="map-toggle">
+                    <span id="label-complex" style="margin-right:8px;">ЖК</span>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-type">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="label-flat" style="margin-left:8px;">Квартиры</span>
+                </div>
+                <select id="filter-city"><option value="">Город</option></select>
+                <input type="text" id="filter-developer" placeholder="Застройщик">
+                <input type="text" id="filter-search" placeholder="Поиск по названию или адресу...">
+            </div>
+            <div id="map"></div>
+        </section>
+    </main>
+</div>
+<script>
+let allComplexes = [], allFlats = [], map, clusterer, currentType = 'complex';
+
+function getCoords(obj) {
+    if (obj.address && obj.address.coordinates && typeof obj.address.coordinates.lat === 'number' && typeof obj.address.coordinates.lng === 'number') {
+        return [obj.address.coordinates.lat, obj.address.coordinates.lng];
+    }
+    // Парсим строку "55.7558, 37.6176"
+    if (obj.address && obj.address.coords && typeof obj.address.coords === 'string') {
+        const [lat, lng] = obj.address.coords.split(',').map(Number);
+        if (!isNaN(lat) && !isNaN(lng)) return [lat, lng];
+    }
+    return null;
+}
+
+async function fetchObjects() {
+    const [complexesRes, flatsRes] = await Promise.all([
+        fetch('/objects/complexes').then(r=>r.json()),
+        fetch('/objects/apartments').then(r=>r.json())
+    ]);
+    allComplexes = (complexesRes.complexes || []).filter(o=>getCoords(o));
+    allFlats = (flatsRes.apartments || []).filter(o=>getCoords(o));
+    buildFilterOptions();
+    renderMap();
+}
+
+function buildFilterOptions() {
+    const cities = Array.from(new Set([...allComplexes, ...allFlats].map(o=>o.address?.city).filter(Boolean))).sort();
+    const developers = Array.from(new Set([...allComplexes, ...allFlats].map(o=>o.developer).filter(Boolean))).sort();
+    const citySel = document.getElementById('filter-city');
+    citySel.innerHTML = '<option value="">Город</option>' + cities.map(c=>`<option>${c}</option>`).join('');
+    const devSel = document.getElementById('filter-developer');
+    devSel.innerHTML = '<option value="">Застройщик</option>' + developers.map(d=>`<option>${d}</option>`).join('');
+}
+
+function getFilteredObjects() {
+    const city = document.getElementById('filter-city').value;
+    const developer = document.getElementById('filter-developer').value.trim();
+    const search = document.getElementById('filter-search').value.trim().toLowerCase();
+    let arr = currentType === 'complex' ? allComplexes : allFlats;
+    if (city) arr = arr.filter(o=>o.address?.city === city);
+    if (developer) arr = arr.filter(o=>o.developer === developer);
+    if (search) arr = arr.filter(o=>
+        (o.name && o.name.toLowerCase().includes(search)) ||
+        (o.title && o.title.toLowerCase().includes(search)) ||
+        (o.address?.street && o.address.street.toLowerCase().includes(search))
+    );
+    return arr;
+}
+
+function renderMap() {
+    if (!window.ymaps) return;
+    if (!map) {
+        map = new ymaps.Map('map', {
+            center: [55.7558, 37.6176],
+            zoom: 5,
+            controls: ['zoomControl', 'fullscreenControl']
+        });
+    }
+    if (clusterer) map.geoObjects.remove(clusterer);
+    clusterer = new ymaps.Clusterer({
+        preset: 'islands#invertedYellowClusterIcons',
+        groupByCoordinates: false,
+        clusterDisableClickZoom: false
+    });
+    const objects = getFilteredObjects();
+    const points = objects.map(obj => {
+        const coords = getCoords(obj);
+        const name = obj.name || obj.title || '';
+        const city = obj.address?.city || '';
+        const dev = obj.developer || '';
+        const price = obj.parameters?.price ? obj.parameters.price.toLocaleString('ru-RU') + ' ₽' : '';
+        const type = obj.name ? 'ЖК' : 'Квартира';
+        const img = obj.images && obj.images[0] ? `<img src="${obj.images[0].path}" style="width:160px;height:120px;object-fit:cover;border-radius:14px;display:block;margin-bottom:10px;">` : '';
+        const balloon = `<div style='font-weight:700;font-size:2em;margin-bottom:10px;line-height:1.2;'>${name}</div>${img}<div style='font-size:1.2em;margin-bottom:4px;'>${city}</div><div style='font-size:1.1em;margin-bottom:4px;'>${dev}</div><div style='font-size:1.1em;color:#22223b;margin-bottom:4px;'>${price}</div><div style='margin-top:8px;font-size:1.1em;color:#bfa900;'>${type}</div>`;
+        return new ymaps.Placemark(coords, { balloonContent: balloon }, {
+            preset: type === 'ЖК' ? 'islands#yellowDotIcon' : 'islands#blackDotIcon'
+        });
+    });
+    clusterer.add(points);
+    map.geoObjects.add(clusterer);
+    if (points.length) map.setBounds(clusterer.getBounds(), { checkZoomRange: true, zoomMargin: 40 });
+}
+
+document.getElementById('toggle-type').addEventListener('change', function(e) {
+    currentType = this.checked ? 'flat' : 'complex';
+    renderMap();
+});
+document.getElementById('filter-city').addEventListener('input', renderMap);
+document.getElementById('filter-developer').addEventListener('input', renderMap);
+document.getElementById('filter-search').addEventListener('input', renderMap);
+
+window.ymaps.ready(fetchObjects);
+</script>
+</body>
+</html> 

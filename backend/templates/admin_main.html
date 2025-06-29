@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buildy — Админка</title>
+    <link rel="stylesheet" href="/admin/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-canvas {
+            max-width: 260px;
+            max-height: 120px;
+            width: 100%;
+            height: 120px;
+            margin: 0 auto;
+            display: block;
+        }
+        .chart-canvas-pie {
+            max-width: 120px;
+            max-height: 120px;
+            width: 100%;
+            height: 120px;
+            margin: 0 auto;
+            display: block;
+        }
+        @media (max-width: 900px) {
+            .chart-canvas, .chart-canvas-pie { max-width: 100vw; height: 90px; }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-wrapper">
+    <aside class="admin-aside">
+        <div class="logo-block">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+                <circle cx="12" cy="12" r="10" fill="#22223b"/>
+                <circle cx="32" cy="12" r="10" fill="#ffe066"/>
+                <circle cx="12" cy="32" r="10" fill="#ffe066"/>
+                <circle cx="32" cy="32" r="10" fill="#22223b"/>
+            </svg>
+            <span class="logo-text">Buildy</span>
+        </div>
+        <nav class="admin-menu">
+            <a href="/admin/main" class="menu-item">Главная страница</a>
+            <a href="#" class="menu-item">Графики и таблицы</a>
+            <a href="#" class="menu-item">Объем сделок по месяцам</a>
+            <a href="#" class="menu-item">Динамика цен по сегментам</a>
+            <a href="#" class="menu-item">Просроченные объекты</a>
+            <a href="#" class="menu-item">Источник трафика и заявок</a>
+            <a href="#" class="menu-item">Модерация объектов</a>
+            <a href="/admin/map" class="menu-item">Интерактивная карта</a>
+            <a href="/admin/objects" class="menu-item">Все объекты (ЖК и квартиры)</a>
+        </nav>
+        <div class="admin-footer">@anyway 2025</div>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-header">
+            <span class="ai-label">AI-помощник</span>
+            <a href="/admin/add-object" class="add-object">Добавить объект +</a>
+            <div class="admin-profile">
+                <label for="avatar-upload" class="avatar-upload-label" title="Загрузить аватар">
+                    <input type="file" id="avatar-upload" accept="image/*" style="display:none">
+                    <img src="" alt="profile" class="profile-img" id="profile-img">
+                    <span class="avatar-upload-icon">&#9998;</span>
+                </label>
+            </div>
+        </header>
+        <section class="admin-dashboard">
+            <div class="dashboard-row">
+                <div class="dashboard-card">
+                    <h2>Спрос по регионам</h2>
+                    <canvas id="chart-demand" class="chart-canvas"></canvas>
+                </div>
+                <div class="dashboard-card">
+                    <h2>Объем сделок по месяцам</h2>
+                    <canvas id="chart-deals" class="chart-canvas"></canvas>
+                </div>
+                <div class="dashboard-card">
+                    <h2>Активность застройщиков</h2>
+                    <canvas id="chart-developers" class="chart-canvas"></canvas>
+                </div>
+            </div>
+            <div class="dashboard-row">
+                <div class="dashboard-card wide">
+                    <h2>Динамика цен по сегментам жилья</h2>
+                    <div class="dashboard-filters">
+                        <select id="region-select"><option>Все регионы</option></select>
+                        <select id="dev-select"><option>Все застройщики</option></select>
+                    </div>
+                    <canvas id="chart-prices" class="chart-canvas" height="90"></canvas>
+                </div>
+                <div class="dashboard-card">
+                    <h2>Аудитория платформы</h2>
+                    <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+                        <canvas id="chart-gender" class="chart-canvas-pie" width="90" height="90"></canvas>
+                        <canvas id="chart-age" class="chart-canvas" height="70"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script>
+// Аватар: загрузка через сервер
+const avatarInput = document.getElementById('avatar-upload');
+const profileImg = document.getElementById('profile-img');
+
+function loadAvatar() {
+    const avatar = localStorage.getItem('avatar');
+    if (avatar) {
+        profileImg.src = avatar;
+    } else {
+        profileImg.src = 'https://randomuser.me/api/portraits/lego/1.jpg';
+    }
+}
+loadAvatar();
+
+avatarInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Проверяем размер файла (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимальный размер: 5MB');
+        return;
+    }
+    
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите изображение');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', 'avatar');
+    
+    // Показываем индикатор загрузки
+    profileImg.style.opacity = '0.5';
+    
+    fetch('/upload-image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Сохраняем путь к изображению в localStorage
+            localStorage.setItem('avatar', data.imagePath);
+            loadAvatar();
+            console.log('Изображение загружено:', data.imagePath);
+        } else {
+            alert('Ошибка загрузки: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки:', error);
+        alert('Ошибка загрузки изображения');
+    })
+    .finally(() => {
+        // Восстанавливаем прозрачность
+        profileImg.style.opacity = '1';
+    });
+});
+
+// Chart.js графики (моковые данные)
+document.addEventListener('DOMContentLoaded', function() {
+    // Спрос по регионам
+    new Chart(document.getElementById('chart-demand'), {
+        type: 'bar',
+        data: {
+            labels: ['Москва', 'Новосибирск', 'Екатеринбург', 'Казань', 'Краснодар', 'Самара'],
+            datasets: [{
+                label: 'Кол-во запросов',
+                data: [1500, 900, 700, 600, 400, 300],
+                backgroundColor: '#22223b',
+                borderRadius: 8,
+                maxBarThickness: 32
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: '#eee' }, beginAtZero: true }
+            }
+        }
+    });
+    // Объем сделок по месяцам
+    new Chart(document.getElementById('chart-deals'), {
+        type: 'line',
+        data: {
+            labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл'],
+            datasets: [{
+                label: 'Количество сделок',
+                data: [100, 120, 150, 180, 220, 260, 300],
+                borderColor: '#ffe066',
+                backgroundColor: 'rgba(255,224,102,0.15)',
+                tension: 0.3,
+                pointBackgroundColor: '#ffe066',
+                pointRadius: 5,
+                fill: true
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: '#eee' }, beginAtZero: true }
+            }
+        }
+    });
+    // Активность застройщиков
+    new Chart(document.getElementById('chart-developers'), {
+        type: 'bar',
+        data: {
+            labels: ['DOGMA', 'Победа', 'Avalin'],
+            datasets: [
+                {
+                    label: 'Добавленные объекты',
+                    data: [50, 30, 20],
+                    backgroundColor: '#22223b',
+                    borderRadius: 8,
+                    maxBarThickness: 24
+                },
+                {
+                    label: 'Закрытые сделки',
+                    data: [35, 18, 12],
+                    backgroundColor: '#ffe066',
+                    borderRadius: 8,
+                    maxBarThickness: 24
+                }
+            ]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom' } },
+            scales: {
+                x: { grid: { display: false }, stacked: true },
+                y: { grid: { color: '#eee' }, beginAtZero: true, stacked: true }
+            }
+        }
+    });
+    // Динамика цен по сегментам жилья
+    new Chart(document.getElementById('chart-prices'), {
+        type: 'line',
+        data: {
+            labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+            datasets: [
+                {
+                    label: 'Эконом',
+                    data: [120000, 122000, 123000, 124000, 124500, 125000],
+                    borderColor: '#22223b',
+                    backgroundColor: 'rgba(34,34,59,0.08)',
+                    tension: 0.3,
+                    pointRadius: 4
+                },
+                {
+                    label: 'Комфорт',
+                    data: [140000, 142000, 143000, 144000, 144500, 145000],
+                    borderColor: '#ffe066',
+                    backgroundColor: 'rgba(255,224,102,0.13)',
+                    tension: 0.3,
+                    pointRadius: 4
+                },
+                {
+                    label: 'Бизнес',
+                    data: [200000, 201000, 202000, 203000, 204000, 205000],
+                    borderColor: '#bfa900',
+                    backgroundColor: 'rgba(191,169,0,0.13)',
+                    tension: 0.3,
+                    pointRadius: 4
+                }
+            ]
+        },
+        options: {
+            plugins: { legend: { position: 'bottom' } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: '#eee' }, beginAtZero: false }
+            }
+        }
+    });
+    // Аудитория: пол
+    new Chart(document.getElementById('chart-gender'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Мужчины', 'Женщины'],
+            datasets: [{
+                data: [60, 40],
+                backgroundColor: ['#ffe066', '#22223b'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            cutout: '70%'
+        }
+    });
+    // Аудитория: возраст
+    new Chart(document.getElementById('chart-age'), {
+        type: 'bar',
+        data: {
+            labels: ['18-24', '25-34', '35-44', '45-54', '55+'],
+            datasets: [{
+                label: 'Пользователи',
+                data: [20, 38, 32, 15, 7],
+                backgroundColor: '#ffe066',
+                borderRadius: 8,
+                maxBarThickness: 24
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { grid: { color: '#eee' }, beginAtZero: true }
+            }
+        }
+    });
+});
+</script>
+</body>
+</html> 
